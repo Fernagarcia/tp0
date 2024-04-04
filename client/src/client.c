@@ -26,9 +26,15 @@ int main(void)
 
 	config = iniciar_config();
 
-	config = config_create("/home/utnso/Desktop/Directorio/TP0/tp0/client/cliente.config");
+	config = config_create("/home/utnso/so-commons-library/tp0/client/cliente.config");
 	
-	log_info(logger, config_get_string_value(config, "CLAVE"));
+	ip = config_get_string_value(config, "CLAVE");
+	puerto = config_get_string_value(config, "PUERTO");
+	valor = config_get_string_value(config, "IP");
+	
+	log_info(logger, ip);
+	log_info(logger, puerto);
+	log_info(logger, valor);
 
 
 	/* ---------------- LEER DE CONSOLA ---------------- */
@@ -76,22 +82,20 @@ void leer_consola(t_log* logger)
 {
 	char* leido;
 
-	while(1)
+	while (1)
 	{
 		leido = readline("> ");
 
 		if (leido) {
             add_history(leido);
         }
-
-        if (!strcmp(leido, "chau")) {
-            rl_free(leido);
-			break;
+        if (!strncmp(leido, "exit", 4)) {
+            free(leido);
+            break;
         }
-
 		log_info(logger, leido);
 
-		rl_free(leido);
+		free(leido);
 	}
 }
 
@@ -112,6 +116,8 @@ void paquete(int conexion)
 	enviar_paquete(paquete, conexion);
 
 	eliminar_paquete(paquete);
+
+	free(leido);
 
 	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
 	
