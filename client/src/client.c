@@ -18,19 +18,15 @@ int main(void)
 
 	logger = iniciar_logger();
 
-	logger = log_create("tp0.log", "Log TP0", 1, LOG_LEVEL_INFO);
-	
 	log_info(logger, "Soy un log");
 
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
 
 	config = iniciar_config();
-
-	config = config_create("/home/utnso/so-commons-library/tp0/client/cliente.config");
 	
-	ip = config_get_string_value(config, "CLAVE");
+	ip = config_get_string_value(config, "IP");
 	puerto = config_get_string_value(config, "PUERTO");
-	valor = config_get_string_value(config, "IP");
+	valor = config_get_string_value(config, "CLAVE");
 	
 	log_info(logger, ip);
 	log_info(logger, puerto);
@@ -51,7 +47,7 @@ int main(void)
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 
-	enviar_mensaje("CLAVE", conexion);
+	enviar_mensaje(valor, conexion);
 
 	// Armamos y enviamos el paquete
 
@@ -68,12 +64,16 @@ t_log* iniciar_logger(void)
 {
 	t_log* nuevo_logger;
 
+	nuevo_logger = log_create("tp0.log", "Log TP0", 1, LOG_LEVEL_INFO);
+	
 	return nuevo_logger;
 }
 
 t_config* iniciar_config(void)
 {
 	t_config* nuevo_config;
+
+	nuevo_config = config_create("/home/utnso/so-commons-library/tp0/client/cliente.config");
 
 	return nuevo_config;
 }
@@ -89,7 +89,7 @@ void leer_consola(t_log* logger)
 		if (leido) {
             add_history(leido);
         }
-        if (!strncmp(leido, "exit", 4)) {
+        if (strncmp(leido, "exit", 4) == 0) {
             free(leido);
             break;
         }
@@ -107,21 +107,33 @@ void paquete(int conexion)
 	
 	t_paquete* paquete;
 
-	// Leemos y esta vez agregamos las lineas al paquete
-
 	paquete = crear_paquete();
 
-	agregar_a_paquete(paquete, leido, sizeof(leido));
+	// Leemos y esta vez agregamos las lineas al paquete
 
-	enviar_paquete(paquete, conexion);
+	leido = readline("> ");
 
-	eliminar_paquete(paquete);
+	while(strcmp(leido, "") != 0)
+	{
+		agregar_a_paquete(paquete, leido, strlen(leido) + 1);
 
-	free(leido);
+		free(leido);
+
+		leido = readline("> ");
+	}
+
+		enviar_paquete(paquete, conexion);
+	
+		eliminar_paquete(paquete);
+
+		free(leido);
+}
+
+	
 
 	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
 	
-}
+
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
 {

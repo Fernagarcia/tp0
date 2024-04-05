@@ -6,7 +6,7 @@ int iniciar_servidor(void)
 {
 	int socket_servidor;
 
-	struct addrinfo hints, *servinfo, *p;
+	struct addrinfo hints, *servinfo;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -40,7 +40,7 @@ int esperar_cliente(int socket_servidor)
 	
 	// Aceptamos un nuevo cliente
 
-	socket_servidor = accept(socket_cliente, NULL, NULL);
+	socket_cliente = accept(socket_servidor, NULL, NULL);
 
 	log_info(logger, "Se conecto un cliente!");
 
